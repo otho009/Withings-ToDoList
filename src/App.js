@@ -8,25 +8,36 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      countTodos: 4,
+      countTodos: 0,
       formValue: "",
-      todos: [
-        { id: 1, done: false, text: "Add new todo with form" },
-        {
-          id: 2,
-          done: false,
-          text: "Create Components : TodoForm, TodoList, TodoItem ...",
-        },
-        { id: 3, done: false, text: "Mark done an item" },
-        { id: 4, done: false, text: "Remove an item" },
-      ],
+      isLoaded: false,
+      todos: [],
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChangeFormvalue = this.handleChangeFormvalue.bind(this);
   }
+  componentDidMount() {
+    fetch("https://my-json-server.typicode.com/otho009/TodoList-MyJson/todos")
+      .then((res) => res.json())
+      .then(
+        (result) => {
+          this.setState({
+            todos: result,
+            isLoaded: true,
+            countTodos:result.length
+          });
+        },
+        (error) => {
+          this.setState({
+            error,
+            isLoaded: true
+
+          });
+        }
+      );
+  }
   handleSubmit(event) {
     event.preventDefault();
-    console.log(event.ta);
     this.setState((prevState) => ({
       todos: [
         ...prevState.todos,
@@ -59,29 +70,35 @@ class App extends Component {
     const indexItem = this.state.todos.findIndex((e) => e.id === id);
     let newTodos = [...this.state.todos];
     newTodos.splice(indexItem, 1);
-    this.setState({
+    this.setState(prevState => ({
       todos: newTodos,
-    });
+      countTodos: prevState.countTodos-1,
+    }));
   };
 
   render() {
-    const { todos } = this.state;
-
-    return (
-      <div className="App">
-        <div className="wrapper">
-          <TodoForm
-            onSubmit={this.handleSubmit}
-            onChange={this.handleChangeFormvalue}
-          />
-          <TodoList
-            todos={todos}
-            onDone={this.handleDone}
-            onRemove={this.handleRemove}
-          />
+    const { todos, error, isLoaded } = this.state;
+    if (error) {
+      return <div>Erreur : {error.message}</div>;
+    } else if (!isLoaded) {
+      return <div>Loading....</div>;
+    } else {
+      return (
+        <div className="App">
+          <div className="wrapper">
+            <TodoForm
+              onSubmit={this.handleSubmit}
+              onChange={this.handleChangeFormvalue}
+            />
+            <TodoList
+              todos={todos}
+              onDone={this.handleDone}
+              onRemove={this.handleRemove}
+            />
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
 }
 
