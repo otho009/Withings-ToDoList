@@ -64,7 +64,7 @@ export default class TodoAppClass extends Component {
       todos: [
         ...prevState.todos,
         {
-          id: (Math.floor(Math.random() * 10000)).toString(),
+          id: Math.floor(Math.random() * 10000).toString(),
           done: false,
           text: this.state.formValue,
         },
@@ -89,7 +89,6 @@ export default class TodoAppClass extends Component {
     });
   };
   handleRemove = (id) => {
-
     const indexItem = this.state.todos.findIndex((e) => e.id === id);
     let newTodos = [...this.state.todos];
     newTodos.splice(indexItem, 1);

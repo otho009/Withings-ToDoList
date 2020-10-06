@@ -31,7 +31,7 @@ export default function ToDoAppHooks() {
       return [
         ...prevTodos,
         {
-          id: (Math.floor(Math.random() * 10000)).toString(),
+          id: Math.floor(Math.random() * 10000).toString(),
           done: false,
           text: formValue,
         },
