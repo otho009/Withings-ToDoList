@@ -4,6 +4,13 @@ import "./App.css";
 import TodoForm from "./TodoForm";
 import TodoList from "./TodoList";
 
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
 export default class TodoAppClass extends Component {
   constructor(props) {
     super(props);
@@ -16,6 +23,22 @@ export default class TodoAppClass extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChangeFormvalue = this.handleChangeFormvalue.bind(this);
   }
+
+  onDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const items = reorder(
+      this.state.todos,
+      result.source.index,
+      result.destination.index
+    );
+
+    this.setState({
+      todos: items,
+    });
+  };
   componentDidMount() {
     fetch("https://my-json-server.typicode.com/otho009/TodoList-MyJson/todos")
       .then((res) => res.json())
@@ -24,14 +47,13 @@ export default class TodoAppClass extends Component {
           this.setState({
             todos: result,
             isLoaded: true,
-            countTodos:result.length
+            countTodos: result.length,
           });
         },
         (error) => {
           this.setState({
             error,
-            isLoaded: true
-
+            isLoaded: true,
           });
         }
       );
@@ -42,7 +64,7 @@ export default class TodoAppClass extends Component {
       todos: [
         ...prevState.todos,
         {
-          id: this.state.countTodos + 1,
+          id: (this.state.todos.length + 1).toString(),
           done: false,
           text: this.state.formValue,
         },
@@ -67,12 +89,13 @@ export default class TodoAppClass extends Component {
     });
   };
   handleRemove = (id) => {
+
     const indexItem = this.state.todos.findIndex((e) => e.id === id);
     let newTodos = [...this.state.todos];
     newTodos.splice(indexItem, 1);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       todos: newTodos,
-      countTodos: prevState.countTodos-1,
+      countTodos: prevState.countTodos - 1,
     }));
   };
 
@@ -84,16 +107,16 @@ export default class TodoAppClass extends Component {
       return <div>Loading....</div>;
     } else {
       return (
-
         <div className="App">
           <div className="wrapper">
-          <h1>{"To Do List Using a Class Component"} </h1>
+            <h1>{"To Do List Using a Class Component"} </h1>
 
             <TodoForm
               onSubmit={this.handleSubmit}
               onChange={this.handleChangeFormvalue}
             />
             <TodoList
+              onDragEnd={this.onDragEnd}
               todos={todos}
               onDone={this.handleDone}
               onRemove={this.handleRemove}
@@ -104,4 +127,3 @@ export default class TodoAppClass extends Component {
     }
   }
 }
-

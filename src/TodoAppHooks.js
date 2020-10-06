@@ -1,27 +1,29 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import TodoForm from "./TodoForm";
 import TodoList from "./TodoList";
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
 export default function ToDoAppHooks() {
   const [countTodos, setCountTodos] = useState(0);
   const [formValue, setFormValue] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const [todos, setTodos] = useState([]);
 
-   useEffect(()=>{
+  useEffect(() => {
     fetch("https://my-json-server.typicode.com/otho009/TodoList-MyJson/todos")
-    .then((res) => res.json())
-    .then(
-      (result) => {
+      .then((res) => res.json())
+      .then((result) => {
         setTodos(result);
         setIsLoaded(true);
-        setCountTodos(result.length)
-      },
-      
-      
-    );
-
-   },[])
+        setCountTodos(result.length);
+      });
+  }, []);
   function handleSubmit(event) {
     event.preventDefault();
     setCountTodos((prevCount) => prevCount + 1);
@@ -29,7 +31,7 @@ export default function ToDoAppHooks() {
       return [
         ...prevTodos,
         {
-          id: countTodos + 1,
+          id: (todos.length + 1).toString(),
           done: false,
           text: formValue,
         },
@@ -56,21 +58,33 @@ export default function ToDoAppHooks() {
     setTodos(newTodos);
     setCountTodos((prevCount) => prevCount - 1);
   }
-if (!isLoaded) {
-  return <div>Loading....</div>;
+  function onDragEnd(result) {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
 
-  
-} else {
-  
-  return (
-    <div className="App">
-      <div className="wrapper">
-        <h1>{"To Do List Using Hooks"} </h1>
+    const items = reorder(todos, result.source.index, result.destination.index);
 
-        <TodoForm onSubmit={handleSubmit} onChange={handleChangeFormvalue} />
-        <TodoList todos={todos} onDone={handleDone} onRemove={handleRemove} />
+    setTodos(items);
+  }
+  if (!isLoaded) {
+    return <div>Loading....</div>;
+  } else {
+    return (
+      <div className="App">
+        <div className="wrapper">
+          <h1>{"To Do List Using Hooks"} </h1>
+
+          <TodoForm onSubmit={handleSubmit} onChange={handleChangeFormvalue} />
+          <TodoList
+            todos={todos}
+            onDone={handleDone}
+            onRemove={handleRemove}
+            onDragEnd={onDragEnd}
+          />
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 }
