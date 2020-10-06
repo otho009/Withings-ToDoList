@@ -64,7 +64,7 @@ export default class TodoAppClass extends Component {
       todos: [
         ...prevState.todos,
         {
-          id: (this.state.todos.length + 1).toString(),
+          id: (Math.floor(Math.random() * 10000)).toString(),
           done: false,
           text: this.state.formValue,
         },
