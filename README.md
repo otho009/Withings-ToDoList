@@ -16,8 +16,8 @@ Two versions of the app are available
 ## Features Implemented
 - Add new todo with form
 - Create Components : TodoForm, TodoList, TodoItem ...
-- Mark done an item"
-- Remove an item"
+- Mark done an item
+- Remove an item
 - Call fake API with fetch to retrieve todos (my-json-server) `https://my-json-server.typicode.com/otho009/TodoList-MyJson/todos`
 - Routing using React-Router-Dom
 - Drag an item to change the order of todos using react-beautiful-dnd
